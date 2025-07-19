@@ -1,0 +1,22 @@
+country: NL
+fields:
+  - id: first_name
+    label: First Name
+    type: text
+    required: true
+  - id: last_name
+    label: Last Name
+    type: text
+    required: true
+  - id: bsn
+    label: BSN
+    type: text
+    required: true
+    validation:
+      - type: regex
+        value: '^\d{9}$'
+        message: 'BSN must be 9 digits'
+  - id: birth_date
+    label: Birth Date
+    type: date
+    required: true

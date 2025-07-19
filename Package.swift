@@ -23,30 +23,36 @@ let package = Package(
         .testTarget(
             name: "KYCFormCoreTests",
             dependencies: ["KYCFormCore"]),
-            
+        
+            .target(
+                name: "KYCFormInfrastructure",
+                dependencies: [
+                    "KYCFormCore",
+                    .product(name: "Yams", package: "Yams")
+                ]),
         .target(
             name: "KYCFormInfrastructure",
             dependencies: [
                 "KYCFormCore",
                 .product(name: "Yams", package: "Yams")
-            ]),
-        .testTarget(
-            name: "KYCFormInfrastructureTests",
-            dependencies: ["KYCFormInfrastructure"]),
-            
-        .target(
-            name: "KYCFormPresentation",
-            dependencies: ["KYCFormCore"]),
+            ],
+            resources: [
+                .process("Resources")
+            ]
+        ),
+            .target(
+                name: "KYCFormPresentation",
+                dependencies: ["KYCFormCore"]),
         .testTarget(
             name: "KYCFormPresentationTests",
             dependencies: ["KYCFormPresentation"]),
-            
-        .target(
-            name: "KYCFormComposition",
-            dependencies: [
-                "KYCFormCore",
-                "KYCFormInfrastructure",
-                "KYCFormPresentation"
-            ])
+        
+            .target(
+                name: "KYCFormComposition",
+                dependencies: [
+                    "KYCFormCore",
+                    "KYCFormInfrastructure",
+                    "KYCFormPresentation"
+                ])
     ]
 )
