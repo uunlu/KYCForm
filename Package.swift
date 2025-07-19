@@ -1,24 +1,53 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
     name: "KYCForm",
+    platforms: [
+        .iOS(.v17)
+    ],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "KYCForm",
-            targets: ["KYCForm"]),
+            targets: ["KYCFormComposition"])
+    ],
+    dependencies: [
+        // Dependencies declare other packages that this package depends on.
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
+        // 1. Core Layer (Domain)
         .target(
-            name: "KYCForm"),
+            name: "KYCFormCore",
+            dependencies: []),
         .testTarget(
-            name: "KYCFormTests",
-            dependencies: ["KYCForm"]
-        ),
+            name: "KYCFormCoreTests",
+            dependencies: ["KYCFormCore"]),
+            
+        // 2. Infrastructure Layer
+        .target(
+            name: "KYCFormInfrastructure",
+            dependencies: ["KYCFormCore"]),
+        .testTarget(
+            name: "KYCFormInfrastructureTests",
+            dependencies: ["KYCFormInfrastructure"]),
+            
+        // 3. Presentation Layer
+        .target(
+            name: "KYCFormPresentation",
+            dependencies: ["KYCFormCore"]),
+        .testTarget(
+            name: "KYCFormPresentationTests",
+            dependencies: ["KYCFormPresentation"]),
+            
+        // 4. Composition Layer
+        .target(
+            name: "KYCFormComposition",
+            dependencies: [
+                "KYCFormCore",
+                "KYCFormInfrastructure",
+                "KYCFormPresentation"
+            ])
     ]
 )
