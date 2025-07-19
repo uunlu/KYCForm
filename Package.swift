@@ -14,10 +14,9 @@ let package = Package(
             targets: ["KYCFormComposition"])
     ],
     dependencies: [
-        // Dependencies declare other packages that this package depends on.
+        .package(url: "https://github.com/jpsim/Yams.git", from: "5.0.0")
     ],
     targets: [
-        // 1. Core Layer (Domain)
         .target(
             name: "KYCFormCore",
             dependencies: []),
@@ -25,15 +24,16 @@ let package = Package(
             name: "KYCFormCoreTests",
             dependencies: ["KYCFormCore"]),
             
-        // 2. Infrastructure Layer
         .target(
             name: "KYCFormInfrastructure",
-            dependencies: ["KYCFormCore"]),
+            dependencies: [
+                "KYCFormCore",
+                .product(name: "Yams", package: "Yams")
+            ]),
         .testTarget(
             name: "KYCFormInfrastructureTests",
             dependencies: ["KYCFormInfrastructure"]),
             
-        // 3. Presentation Layer
         .target(
             name: "KYCFormPresentation",
             dependencies: ["KYCFormCore"]),
@@ -41,7 +41,6 @@ let package = Package(
             name: "KYCFormPresentationTests",
             dependencies: ["KYCFormPresentation"]),
             
-        // 4. Composition Layer
         .target(
             name: "KYCFormComposition",
             dependencies: [
