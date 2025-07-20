@@ -17,7 +17,7 @@ public struct CountryConfiguration: Equatable {
     public let countryCode: String
     
     /// The ordered list of field definitions that make up the form for this country.
-    public var fields: [FieldDefinition]
+    public let fields: [FieldDefinition]
     
     public init(countryCode: String, fields: [FieldDefinition]) {
         self.countryCode = countryCode

@@ -20,13 +20,16 @@ public protocol CountryBehavior {
     
     /// Transforms the list of field definitions after they have been loaded from the configuration.
     ///
-    /// This method can be used to modify fields, such as marking them as read-only,
-    /// after pre-filled data has been applied.
+    /// This method can be used to create a new set of definitions with modifications,
+    /// such as marking fields as read-only after pre-filled data has been applied.
+    /// It promotes immutability by returning a new array rather than modifying one in place.
+    ///
     /// - Parameters:
-    ///   - definitions: An `inout` array of `FieldDefinition`s to be modified directly.
+    ///   - definitions: The original, unmodified list of `FieldDefinition`s from the configuration.
     ///   - prefilledData: The data that was fetched by the `prefilledDataLoader`. `nil` if no data was fetched.
+    /// - Returns: A new array of `FieldDefinition`s with the behavior's transformations applied.
     func apply(
-        to definitions: inout [FieldDefinition],
+        to definitions: [FieldDefinition],
         with prefilledData: [String: Any]?
-    )
+    ) -> [FieldDefinition]
 }

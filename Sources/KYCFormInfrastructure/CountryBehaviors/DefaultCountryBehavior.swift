@@ -21,10 +21,7 @@ struct DefaultCountryBehavior: CountryBehavior {
     }
     
     /// This behavior does not apply any transformations to the field definitions.
-    func apply(
-        to definitions: inout [FieldDefinition],
-        with prefilledData: [String: Any]?
-    ) {
-        // No-op: Do nothing.
+    func apply(to definitions: [FieldDefinition], with prefilledData: [String: Any]?) -> [FieldDefinition] {
+        return definitions
     }
 }

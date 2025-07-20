@@ -21,16 +21,13 @@ struct NetherlandsBehavior: CountryBehavior {
     }
     
     /// After data is fetched, this method finds the relevant fields and marks them as read-only.
-    func apply(
-        to definitions: inout [FieldDefinition],
-        with prefilledData: [String: Any]?
-    ) {
-        for i in definitions.indices {
-            let fieldID = definitions[i].id
-            
-            if readOnlyFieldIDs.contains(fieldID) {
-                definitions[i].isReadOnly = true
+    func apply(to definitions: [FieldDefinition], with prefilledData: [String: Any]?) -> [FieldDefinition] {
+        var newDefinitions = definitions
+        for i in newDefinitions.indices {
+            if readOnlyFieldIDs.contains(newDefinitions[i].id) {
+                newDefinitions[i].isReadOnly = true
             }
         }
+        return newDefinitions
     }
 }

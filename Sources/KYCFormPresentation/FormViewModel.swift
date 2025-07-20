@@ -43,7 +43,7 @@ public final class FormViewModel: ObservableObject {
     /// This is the main orchestration method.
     public func loadForm(for countryCode: String) async {
         isLoading = true
-        defer { isLoading = false } // Ensure isLoading is set to false when the function exits
+        defer { isLoading = false }
         
         let configResult = await configurationLoader.load(countryCode: countryCode)
         guard case .success(var config) = configResult else {
@@ -64,10 +64,9 @@ public final class FormViewModel: ObservableObject {
             // TODO: Handle data loading errors
         }
         
-        behavior.apply(to: &config.fields, with: prefilledData)
+        let finalFieldDefinitions = behavior.apply(to: config.fields, with: prefilledData)
         
-        // 5. Create the FieldViewModels from the final field definitions
-        self.fieldViewModels = config.fields.map { definition in
+        self.fieldViewModels = finalFieldDefinitions.map { definition in
             FieldViewModel(
                 definition: definition,
                 prefilledValue: prefilledData?[definition.id]
