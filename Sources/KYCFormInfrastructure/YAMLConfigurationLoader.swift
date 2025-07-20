@@ -9,7 +9,7 @@ import Foundation
 import Yams
 import KYCFormCore
 
-final class YAMLConfigurationLoader: ConfigurationLoader {
+public final class YAMLConfigurationLoader: ConfigurationLoader {
     
     enum LoaderError: Error, LocalizedError {
         case fileNotFound(String)
@@ -27,11 +27,15 @@ final class YAMLConfigurationLoader: ConfigurationLoader {
     
     private let bundle: Bundle
     
-    init(bundle: Bundle = .module) {
+    public init(bundle: Bundle) {
         self.bundle = bundle
     }
     
-    func load(countryCode: String) async -> Result<CountryConfiguration, Error> {
+    public static func makeForPackageResources() -> YAMLConfigurationLoader {
+        return YAMLConfigurationLoader(bundle: .module)
+    }
+    
+    public func load(countryCode: String) async -> Result<CountryConfiguration, Error> {
         let fileName = countryCode.lowercased()
         
         guard let fileURL = bundle.url(forResource: fileName, withExtension: "yaml") else {
