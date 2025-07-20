@@ -12,21 +12,28 @@ let package = Package(
     products: [
         .library(
             name: "KYCForm",
-            targets: ["KYCFormComposition"])
+            targets: ["KYCFormComposition"]
+        ),
+        .library(
+            name: "KYCFormUI",
+            targets: ["KYCFormUI"]
+        )
     ],
     dependencies: [
-        .package(url: "https://github.com/jpsim/Yams.git", from: "6.0.1")
+        .package(url: "https://github.com/jpsim/Yams.git", from: "6.0.2")
     ],
     targets: [
-        // Core
+        // MARK: - Core Layer (Domain)
         .target(
             name: "KYCFormCore",
-            dependencies: []),
+            dependencies: []
+        ),
         .testTarget(
             name: "KYCFormCoreTests",
-            dependencies: ["KYCFormCore"]),
+            dependencies: ["KYCFormCore"]
+        ),
         
-        // Infrastructure
+        // MARK: - Infrastructure Layer
         .target(
             name: "KYCFormInfrastructure",
             dependencies: [
@@ -34,29 +41,42 @@ let package = Package(
                 .product(name: "Yams", package: "Yams")
             ],
             resources: [
-                .process("Resources"),
-                .process("TestResources")
+                .process("Resources") // Main app resources (e.g., nl.yaml)
             ]
         ),
         .testTarget(
             name: "KYCFormInfrastructureTests",
-            dependencies: ["KYCFormInfrastructure"]),
+            dependencies: ["KYCFormInfrastructure"],
+            resources: [
+                .process("TestResources") // Test-only resources
+            ]
+        ),
         
-        // Presentation
+        // MARK: - Presentation Layer (ViewModels)
         .target(
             name: "KYCFormPresentation",
-            dependencies: ["KYCFormCore", "KYCFormInfrastructure"]),
+            dependencies: ["KYCFormCore", "KYCFormInfrastructure"]
+        ),
         .testTarget(
             name: "KYCFormPresentationTests",
-            dependencies: ["KYCFormPresentation"]),
+            dependencies: ["KYCFormPresentation"]
+        ),
         
-        // Composition
+        // MARK: - UI Layer (Views)
+        .target(
+            name: "KYCFormUI",
+            dependencies: ["KYCFormPresentation"]
+        ),
+        
+        // MARK: - Composition Layer
         .target(
             name: "KYCFormComposition",
             dependencies: [
                 "KYCFormCore",
                 "KYCFormInfrastructure",
-                "KYCFormPresentation"
-            ])
+                "KYCFormPresentation",
+                "KYCFormUI"
+            ]
+        )
     ]
 )
