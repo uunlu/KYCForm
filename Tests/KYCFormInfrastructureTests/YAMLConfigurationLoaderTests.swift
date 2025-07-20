@@ -10,11 +10,9 @@ import XCTest
 import KYCFormCore
 
 final class YAMLConfigurationLoaderTests: XCTestCase {
-
     func test_load_deliversConfigurationOnFoundValidFile() async {
         // GIVEN: A loader configured with the test bundle
-        let testBundle = Bundle(for: YAMLConfigurationLoaderTests.self)
-        let sut = YAMLConfigurationLoader(bundle: testBundle)
+        let sut = YAMLConfigurationLoader()
         
         // WHEN: We attempt to load the 'nl' configuration
         let result = await sut.load(countryCode: "nl")

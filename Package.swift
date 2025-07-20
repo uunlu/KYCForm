@@ -33,7 +33,8 @@ let package = Package(
                 .product(name: "Yams", package: "Yams")
             ],
             resources: [
-                .process("Resources")
+                .process("Resources"),
+                .process("TestResources")
             ]
         ),
         .testTarget(
