@@ -45,7 +45,7 @@ let package = Package(
         // Presentation
         .target(
             name: "KYCFormPresentation",
-            dependencies: ["KYCFormCore"]),
+            dependencies: ["KYCFormCore", "KYCFormInfrastructure"]),
         .testTarget(
             name: "KYCFormPresentationTests",
             dependencies: ["KYCFormPresentation"]),

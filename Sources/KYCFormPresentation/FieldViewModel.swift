@@ -14,7 +14,7 @@ import KYCFormCore
 /// It holds the user's input, manages its validation state, and exposes properties
 /// that a SwiftUI view can bind to. It acts as a bridge between the `FieldDefinition`
 /// domain model and the UI.
-@MainActor // Ensures all UI-related updates happen on the main thread.
+@MainActor
 public final class FieldViewModel: ObservableObject, Identifiable {
     
     // MARK: - Properties for UI Binding
@@ -53,7 +53,6 @@ public final class FieldViewModel: ObservableObject, Identifiable {
         // Clear previous error message
         errorMessage = nil
         
-        // Iterate through all rules. The first one that fails stops the process.
         for rule in validationRules {
             if let error = rule.validate(typedValue()) {
                 errorMessage = error.message
