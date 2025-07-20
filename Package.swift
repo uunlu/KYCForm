@@ -14,9 +14,10 @@ let package = Package(
             targets: ["KYCFormComposition"])
     ],
     dependencies: [
-        .package(url: "https://github.com/jpsim/Yams.git", from: "5.0.0")
+        .package(url: "https://github.com/jpsim/Yams.git", from: "6.0.1")
     ],
     targets: [
+        // Core
         .target(
             name: "KYCFormCore",
             dependencies: []),
@@ -24,12 +25,7 @@ let package = Package(
             name: "KYCFormCoreTests",
             dependencies: ["KYCFormCore"]),
         
-            .target(
-                name: "KYCFormInfrastructure",
-                dependencies: [
-                    "KYCFormCore",
-                    .product(name: "Yams", package: "Yams")
-                ]),
+        // Infrastructure
         .target(
             name: "KYCFormInfrastructure",
             dependencies: [
@@ -40,19 +36,25 @@ let package = Package(
                 .process("Resources")
             ]
         ),
-            .target(
-                name: "KYCFormPresentation",
-                dependencies: ["KYCFormCore"]),
+        .testTarget(
+            name: "KYCFormInfrastructureTests",
+            dependencies: ["KYCFormInfrastructure"]),
+        
+        // Presentation
+        .target(
+            name: "KYCFormPresentation",
+            dependencies: ["KYCFormCore"]),
         .testTarget(
             name: "KYCFormPresentationTests",
             dependencies: ["KYCFormPresentation"]),
         
-            .target(
-                name: "KYCFormComposition",
-                dependencies: [
-                    "KYCFormCore",
-                    "KYCFormInfrastructure",
-                    "KYCFormPresentation"
-                ])
+        // Composition
+        .target(
+            name: "KYCFormComposition",
+            dependencies: [
+                "KYCFormCore",
+                "KYCFormInfrastructure",
+                "KYCFormPresentation"
+            ])
     ]
 )
