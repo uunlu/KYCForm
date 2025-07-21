@@ -46,7 +46,7 @@ struct CodableFieldDefinition: Codable {
             type: mapFieldType(type),
             isRequired: required ?? false,
             isReadOnly: false, // Default to not read-only; behaviors will change this
-            validationRules: validation?.map { $0.toDomain() } ?? []
+            validationRules: rules
         )
     }
     

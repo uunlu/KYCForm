@@ -251,6 +251,55 @@ final class FormViewModelTests: XCTestCase {
         // THIS ASSERTION WILL FAIL IF THE BUG IS PRESENT
         XCTAssertEqual(lastNameVM.errorMessage, "Last name is required", "The second invalid field should also have its error message set, but it was nil.")
     }
+    
+    @MainActor
+    func test_submit_withEmptyRequiredFields_showsValidationErrors() async throws {
+        // GIVEN: A form with required fields
+        let firstNameField = FieldDefinition(
+            id: "firstName",
+            label: "First Name",
+            type: .text,
+            isRequired: true,
+            validationRules: [RequiredValidationRule(message: "First name is required")]
+        )
+        
+        let lastNameField = FieldDefinition(
+            id: "lastName",
+            label: "Last Name",
+            type: .text,
+            isRequired: true,
+            validationRules: [RequiredValidationRule(message: "Last name is required")]
+        )
+        
+        let config = CountryConfiguration(countryCode: "TEST", fields: [firstNameField, lastNameField])
+        mockConfigurationLoader.result = .success(config)
+        
+        sut = FormViewModel(
+            configurationLoader: mockConfigurationLoader,
+            behaviorRegistry: mockBehaviorRegistry
+        )
+        
+        // Load the form
+        await sut.loadForm(for: "TEST")
+        
+        // Get the field view models
+        let firstNameVM = try XCTUnwrap(sut.fieldViewModels.first { $0.id == "firstName" })
+        let lastNameVM = try XCTUnwrap(sut.fieldViewModels.first { $0.id == "lastName" })
+        
+        // Ensure fields are empty (default state)
+        XCTAssertEqual(firstNameVM.value, "")
+        XCTAssertEqual(lastNameVM.value, "")
+        XCTAssertNil(firstNameVM.errorMessage)
+        XCTAssertNil(lastNameVM.errorMessage)
+        
+        // WHEN: User submits the form with empty required fields
+        let result = sut.submit()
+        
+        // THEN: Submission should fail and both fields should show validation errors
+        XCTAssertNil(result, "Submit should return nil when validation fails")
+        XCTAssertEqual(firstNameVM.errorMessage, "First name is required")
+        XCTAssertEqual(lastNameVM.errorMessage, "Last name is required")
+    }
 }
 
 extension FormViewModel {
