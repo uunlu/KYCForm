@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "B415BC41-E364-471C-AC59-08F0A3F0BE29",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "KYCFormCoreTests",
+        "name" : "KYCFormCoreTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "KYCFormInfrastructureTests",
+        "name" : "KYCFormInfrastructureTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "KYCFormPresentationTests",
+        "name" : "KYCFormPresentationTests"
+      }
+    }
+  ],
+  "version" : 1
+}

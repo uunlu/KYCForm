@@ -9,6 +9,9 @@ import Foundation
 import Combine
 import KYCFormCore
 import KYCFormInfrastructure
+#if canImport(UIKit)
+import UIKit
+#endif
 
 @MainActor
 public final class FormViewModel: ObservableObject {
@@ -22,7 +25,6 @@ public final class FormViewModel: ObservableObject {
         }
     }
     
-    // List of available countries for the picker
     public let availableCountryCodes = ["NL", "DE", "US"]
     
     // MARK: - Private Dependencies
@@ -35,19 +37,28 @@ public final class FormViewModel: ObservableObject {
     ) {
         self.configurationLoader = configurationLoader
         self.behaviorRegistry = behaviorRegistry
+        
+        // --- THIS IS THE FIX ---
+        // Trigger the initial form load when the view model is created.
+        // The didSet on selectedCountryCode is not called during initialization,
+        // so we must kick off the process manually.
+        Task {
+            await loadForm(for: selectedCountryCode)
+        }
+    }
+    
+    public func initialize() async {
+        await loadForm(for: selectedCountryCode)
     }
     
     // MARK: - Public Methods
     
-    /// Loads the entire form configuration for a given country code.
-    /// This is the main orchestration method.
     public func loadForm(for countryCode: String) async {
         isLoading = true
         defer { isLoading = false }
         
         let configResult = await configurationLoader.load(countryCode: countryCode)
-        guard case .success(var config) = configResult else {
-            // TODO: Handle configuration loading errors properly in the UI
+        guard case .success(let config) = configResult else {
             print("Error loading configuration: \(configResult)")
             self.fieldViewModels = []
             return
@@ -61,7 +72,6 @@ public final class FormViewModel: ObservableObject {
             if case .success(let data) = dataResult {
                 prefilledData = data
             }
-            // TODO: Handle data loading errors
         }
         
         let finalFieldDefinitions = behavior.apply(to: config.fields, with: prefilledData)
@@ -74,29 +84,32 @@ public final class FormViewModel: ObservableObject {
         }
     }
     
-    /// Validates all fields and returns the collected data on success.
     public func submit() -> FormData? {
-        let allValid = fieldViewModels.map { $0.validate() }.allSatisfy { $0 }
-        
-        if allValid {
-            var formData = FormData()
-            for vm in fieldViewModels {
-                // Only include non-read-only fields in the final submission data
-                if !vm.isReadOnly {
-                    formData[vm.id] = vm.typedValue()
-                }
+        var allFieldsAreValid = true
+        for vm in fieldViewModels {
+            if !vm.validate() {
+                allFieldsAreValid = false
             }
-            return formData
-        } else {
-            // If any field is invalid, return nil
+        }
+
+        guard allFieldsAreValid else {
+            #if canImport(UIKit)
+            UIAccessibility.post(notification: .announcement, argument: "Submission failed, please review errors.")
+            #endif
             return nil
         }
+
+        var formData = FormData()
+        for vm in fieldViewModels {
+            if !vm.isReadOnly {
+                formData[vm.id] = vm.typedValue()
+            }
+        }
+        return formData
     }
 }
 
-
-// MARK: - Extension
-
+// MARK: - Private Helper Extension
 private extension FieldViewModel {
     func typedValue() -> Any? {
         switch type {
@@ -105,10 +118,7 @@ private extension FieldViewModel {
         case .number:
             return Double(value)
         case .date:
-            // TODO: This is a simplification. A real app would need a robust
-            // way to convert the formatted date string back to a Date object.
-            // For now, we return the string.
-            return value
+            return value.isEmpty ? nil : value
         }
     }
 }
