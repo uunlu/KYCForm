@@ -38,10 +38,6 @@ public final class FormViewModel: ObservableObject {
         self.configurationLoader = configurationLoader
         self.behaviorRegistry = behaviorRegistry
         
-        // --- THIS IS THE FIX ---
-        // Trigger the initial form load when the view model is created.
-        // The didSet on selectedCountryCode is not called during initialization,
-        // so we must kick off the process manually.
         Task {
             await loadForm(for: selectedCountryCode)
         }
@@ -75,7 +71,7 @@ public final class FormViewModel: ObservableObject {
         }
         
         let finalFieldDefinitions = behavior.apply(to: config.fields, with: prefilledData)
-        
+        print(finalFieldDefinitions)
         self.fieldViewModels = finalFieldDefinitions.map { definition in
             FieldViewModel(
                 definition: definition,

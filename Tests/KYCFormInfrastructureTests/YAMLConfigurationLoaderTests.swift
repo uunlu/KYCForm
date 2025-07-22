@@ -48,7 +48,7 @@ final class YAMLConfigurationLoaderTests: XCTestCase {
             }
 
         case .failure(let error):
-            XCTFail("Expected success, but got failure: $error)")
+            XCTFail("Expected success, but got failure: \(error)")
         }
     }
 }

@@ -19,6 +19,7 @@ public final class FieldViewModel: ObservableObject, Identifiable {
     
     // MARK: - Properties for UI Binding
     @Published public var value: String = ""
+    @Published public var dateValue: Date?
     @Published public private(set) var errorMessage: String?
     
     // MARK: - Static Properties from Domain Model
@@ -42,7 +43,12 @@ public final class FieldViewModel: ObservableObject, Identifiable {
         self.validationRules = definition.validationRules
         
         if let prefilledValue {
-            self.value = formatValue(prefilledValue)
+            if definition.type == .date, let date = prefilledValue as? Date {
+                self.dateValue = date
+                self.value = formatDate(date)
+            } else {
+                self.value = formatValue(prefilledValue)
+            }
         }
     }
     
@@ -79,14 +85,17 @@ public final class FieldViewModel: ObservableObject, Identifiable {
         }
     }
     
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter() 
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return formatter.string(from: date)
+    }
+    
     /// Formats an initial value of `Any?` into a displayable `String`.
     private func formatValue(_ value: Any) -> String {
         if let date = value as? Date {
-            // TODO: In a real app, use a shared DateFormatter.
-            let formatter = DateFormatter()
-            formatter.dateStyle = .medium
-            formatter.timeStyle = .none
-            return formatter.string(from: date)
+            return formatDate(date)
         }
         
         if let string = value as? String {

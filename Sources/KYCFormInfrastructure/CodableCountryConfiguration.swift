@@ -40,6 +40,10 @@ struct CodableFieldDefinition: Codable {
             rules.insert(RequiredValidationRule(), at: 0)
         }
         
+        if type == "date" {
+            addDefaultDateValidations(to: &rules)
+        }
+        
         return FieldDefinition(
             id: id,
             label: label,
@@ -58,6 +62,28 @@ struct CodableFieldDefinition: Codable {
         default: return .text // Fallback
         }
     }
+    
+    private func addDefaultDateValidations(to rules: inout [any ValidationRule]) {
+            // Check if NotNilDateValidator already exists
+            let hasNotNilValidator = rules.contains { rule in
+                Swift.type(of: rule) == NotNilDateValidator.self
+            }
+            
+            // Check if NotFutureDateValidator already exists
+            let hasNotFutureValidator = rules.contains { rule in
+                Swift.type(of: rule) == NotFutureDateValidator.self
+            }
+            
+            // Add NotNilDateValidator if not already present
+            if !hasNotNilValidator {
+            }
+        rules.append(NotNilDateValidator())
+        rules.append(NotFutureDateValidator())
+            
+            // Add NotFutureDateValidator if not already present
+            if !hasNotFutureValidator {
+            }
+        }
 }
 
 // MARK: - Validation Rule
