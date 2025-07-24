@@ -18,9 +18,8 @@ struct NetherlandsBehavior: CountryBehavior {
 
     func prefilledDataLoader() -> PrefilledDataLoader? {
         // TODO: URL generating should go into a enum constant provider
-        let url = URL(string: "https://some-api.com/api/nl-user-profile")! // swiftlint:disable:this force_unwrapping
         let client = MockHTTPClient.makeSuccessNLProfileClient()
-        return RemotePrefilledDataLoader(url: url, client: client)
+        return RemotePrefilledDataLoader(url: APIEndpoints.nlProfile, client: client)
     }
 
     /// After data is fetched, this method finds the relevant fields and marks them as read-only.
@@ -33,4 +32,8 @@ struct NetherlandsBehavior: CountryBehavior {
             return updatedField
         }
     }
+}
+
+enum APIEndpoints {
+    static let nlProfile = URL(string: "https://some-api.com/api/nl-user-profile")!
 }

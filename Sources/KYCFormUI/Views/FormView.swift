@@ -96,17 +96,3 @@ public struct FormView: View {
 
     FormView(viewModel: viewModel)
 }
-
-// MARK: - Preview Provider
-
-#Preview {
-    let loader = YAMLConfigurationLoader.makeForPackageResources()
-    let registry = CountryBehaviorRegistry()
-
-    let viewModel = FormViewModel(
-        configurationLoader: loader,
-        behaviorRegistry: registry
-    )
-
-    FormView(viewModel: viewModel)
-}
