@@ -35,5 +35,5 @@ struct NetherlandsBehavior: CountryBehavior {
 }
 
 enum APIEndpoints {
-    static let nlProfile = URL(string: "https://some-api.com/api/nl-user-profile")!
+    static let nlProfile = URL(string: "https://some-api.com/api/nl-user-profile")! // swiftlint:disable:this force_unwrapping
 }

@@ -76,12 +76,10 @@ public final class FieldViewModel: ObservableObject, Identifiable {
     }
 
     // MARK: - Private Helpers
-    
+
     private func clearErrorIfValid() {
-        for rule in validationRules {
-            if rule.validate(typedValue()) != nil {
-                return // Still has validation errors, don't clear
-            }
+        for rule in validationRules where rule.validate(typedValue()) != nil {
+            return // Still has validation errors, don't clear
         }
         errorMessage = nil
     }
