@@ -15,12 +15,12 @@ final class YAMLConfigurationLoaderTests: XCTestCase {
         let sut = YAMLConfigurationLoader.makeForPackageResources()
         
         // WHEN: We attempt to load the 'nl' configuration
-        let result = await sut.load(countryCode: "nl")
+        let result = await sut.load(countryCode: .netherlands)
         
         // THEN: We expect a successful result with the correct configuration
         switch result {
         case .success(let config):
-            XCTAssertEqual(config.countryCode, "NL")
+            XCTAssertEqual(config.countryCode, .netherlands)
             XCTAssertEqual(config.fields.count, 4)
             XCTAssertEqual(config.fields[0].id, "first_name")
             XCTAssertEqual(config.fields[0].label, "First Name")

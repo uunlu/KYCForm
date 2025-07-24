@@ -46,10 +46,7 @@ let package = Package(
         ),
         .testTarget(
             name: "KYCFormInfrastructureTests",
-            dependencies: ["KYCFormInfrastructure"],
-            resources: [
-                .process("TestResources") // Test-only resources
-            ]
+            dependencies: ["KYCFormInfrastructure"]
         ),
         
         // MARK: - Presentation Layer (ViewModels)

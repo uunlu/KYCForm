@@ -15,7 +15,6 @@ import UIKit
 
 @MainActor
 public final class FormViewModel: ObservableObject {
-    
     // MARK: - Published Properties for UI
     @Published public private(set) var fieldViewModels: [FieldViewModel] = []
     @Published public private(set) var isLoading: Bool = false
@@ -99,7 +98,6 @@ public final class FormViewModel: ObservableObject {
         var formData = FormData()
         for vm in fieldViewModels {
             if !vm.isReadOnly {
-                // Use the correct typedValue() from the private extension
                 formData[vm.id] = vm.typedValue()
             }
         }
