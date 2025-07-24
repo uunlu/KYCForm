@@ -2,44 +2,302 @@
 
 A production-ready, type-safe KYC form engine for iOS and macOS applications. Built with SwiftUI and designed for enterprise-scale financial applications requiring dynamic form generation and country-specific compliance.
 
-## Quick Start
+## How to Run the App
 
+### Option 1: Using Xcode with Swift Package Manager
+
+1. **Clone or download the repository:**
+   ```bash
+   git clone https://github.com/uunlu/KYCForm.git
+   cd KYCForm
+   ```
+
+2. **Open in Xcode:**
+   ```bash
+   open Package.swift
+   ```
+
+3. **Run the example/preview:**
+   - Navigate to `Sources/KYCFormUI/Views/FormView.swift`
+   - Click the "Resume" button in the Canvas to see the live preview
+   - Or use the preview at the bottom of the file
+
+### Option 2: Integration into Existing Project (Local Files)
+
+1. **Download and add the package locally:**
+   ```bash
+   # Download the package
+   git clone https://github.com/uunlu/KYCForm.git
+   
+   # Or download as ZIP and extract
+   ```
+
+2. **Add Local Package to Xcode:**
+   - Open your existing Xcode project
+   - File → Add Package Dependencies
+   - Click "Add Local..." at the bottom left
+   - Navigate to and select the `KYCForm` folder you downloaded
+   - Click "Add Package"
+   - Select the modules you need (typically just "KYCForm")
+
+3. **Basic Usage:**
+   ```swift
+   import SwiftUI
+   import KYCForm
+
+   struct ContentView: View {
+       @State private var isCompleted = false
+       
+       var body: some View {
+           if isCompleted {
+               Text("KYC Completed! ✅")
+           } else {
+               let (_, formView) = FormComposer.makeKycFormView { formData in
+                   print("KYC Data: \(formData)")
+                   isCompleted = true
+               }
+               formView
+           }
+       }
+   }
+   ```
+
+### Option 3: Swift Playground
+
+1. **Create a new Swift Playground**
+
+2. **Add local package dependency:**
+   - In Playground, go to File → Add Package Dependencies
+   - Click "Add Local..."
+   - Select your downloaded KYCForm folder
+   - Click "Add Package"
+
+3. **Use in playground:**
+   ```swift
+   import KYCForm
+   import SwiftUI
+   import PlaygroundSupport
+
+   struct PlaygroundView: View {
+       var body: some View {
+           let (_, formView) = FormComposer.makeKycFormView { formData in
+               print("Form completed with data: \(formData)")
+           }
+           return formView
+       }
+   }
+
+   PlaygroundPage.current.setLiveView(PlaygroundView())
+   ```
+
+### Troubleshooting
+
+**Module not found**: Ensure the package is properly added and all source files are included in your target.
+
+**Missing Yams dependency**: Add via File → Add Package Dependencies → `https://github.com/jpsim/Yams`
+
+**Resource files not found**: Copy the `Resources` folder from `Sources/KYCFormInfrastructure/Resources/` to your project bundle.
+
+## Demo
+
+Here's the KYC form in action, showing dynamic form generation and country-specific behaviors:
+
+![KYC Form Demo](KYCFormPreview.gif)
+
+**Key Features Demonstrated:**
+- Country selection with flag emojis
+- Dynamic form generation from YAML configuration
+- Netherlands-specific behavior (API prefilling + read-only fields)
+- Real-time validation with error clearing
+- Form submission and completion flow
+
+## Solution Architecture
+
+The package implements **Clean Architecture** with a layered, protocol-oriented design that separates concerns and ensures testability:
+
+### Architecture Layers
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    KYCFormComposition                       │
+│              (Dependency Injection Layer)                   │
+│  • FormComposer (Composition Root)                          │
+│  • KYCFormFlow (Coordinator)                                │
+└─────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────┐
+│                        KYCFormUI                            │
+│                   (Presentation Layer)                      │
+│  • FormView • FieldViewFactory • TextFieldView              │
+│  • DateFieldView • SwiftUI Components                       │
+└─────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────┐
+│                   KYCFormPresentation                       │
+│                    (ViewModel Layer)                        │
+│  • FormViewModel • FieldViewModel                           │
+│  • @Published properties • Combine integration              │
+└─────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────┐
+│                  KYCFormInfrastructure                      │
+│                 (Implementation Layer)                      │
+│  • YAMLConfigurationLoader • RemotePrefilledDataLoader      │
+│  • CountryBehavior implementations • HTTPClient             │
+└─────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────┐
+│                     KYCFormCore                             │
+│                    (Domain Layer)                           │
+│  • Domain Models • Protocols • Validation Rules             │
+│  • Business Logic • Type Definitions                        │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Key Architectural Patterns
+
+#### 1. Composition Root Pattern
 ```swift
-import KYCForm
-
-struct MyApp: View {
-    var body: some View {
-        let (flow, formView) = FormComposer.makeKycFormView { formData in
-            print("KYC completed: \(formData)")
-        }
-        return formView
+// Single entry point that wires all dependencies
+public final class FormComposer {
+    public static func makeKycFormView(onComplete: @escaping (FormData) -> Void) -> (flow: KYCFormFlow, view: some View) {
+        let flow = KYCFormFlow(onComplete: onComplete)
+        let view = FormView(viewModel: flow.formViewModel)
+        return (flow, view)
     }
 }
 ```
 
-## Architecture
-
-The package follows Clean Architecture principles with clear separation of concerns:
-
-```
-KYCFormCore         → Domain models, protocols, and business rules
-KYCFormInfrastructure → YAML parsing, HTTP clients, country behaviors
-KYCFormPresentation → ViewModels and presentation logic
-KYCFormUI           → SwiftUI views and field renderers
-KYCFormComposition  → Dependency injection and composition root
+#### 2. Strategy Pattern for Country Behaviors
+```swift
+// Encapsulates country-specific logic
+public protocol CountryBehavior {
+    func prefilledDataLoader() -> PrefilledDataLoader?
+    func apply(to definitions: [FieldDefinition], with prefilledData: [String: Any]?) -> [FieldDefinition]
+}
 ```
 
-**Key Design Principles:**
-- **Protocol-Oriented**: Easy to mock, test, and extend
-- **Type-Safe**: `CountryCode` enum prevents runtime errors
-- **Immutable**: Configuration data is immutable after loading
-- **Thread-Safe**: Proper concurrency handling throughout
-- **Testable**: Clean boundaries enable comprehensive testing
+#### 3. Protocol-Oriented Design
+```swift
+// Abstraction for configuration loading
+public protocol ConfigurationLoader {
+    func load(countryCode: CountryCode) async -> Result<CountryConfiguration, Error>
+}
 
-## Features
+// Abstraction for HTTP operations
+public protocol HTTPClient {
+    func get(from url: URL) async -> Result<(Data, HTTPURLResponse), Error>
+}
+```
 
-### ✅ Dynamic Form Generation
-Forms are generated from YAML configuration files per country:
+### Data Flow
+
+```
+User Input → FieldViewModel → FormViewModel → CountryBehavior → ConfigurationLoader
+    ↑                                                                    ↓
+UI Updates ← FormView ← Validation ← Business Logic ← Domain Models ← YAML Config
+```
+
+### Key Design Decisions
+
+1. **Dependency Inversion**: High-level modules don't depend on low-level modules
+2. **Single Responsibility**: Each class has one reason to change
+3. **Open/Closed Principle**: Open for extension (new countries) but closed for modification
+4. **Interface Segregation**: Small, focused protocols rather than large interfaces
+5. **Type Safety**: Enum-based country codes prevent runtime string errors
+
+## Netherlands-Specific Behavior Implementation
+
+The Netherlands requires special handling: fetching user data from an API and making certain fields read-only. This was implemented using the **Strategy Pattern**:
+
+### 1. NetherlandsBehavior Implementation
+
+```swift
+struct NetherlandsBehavior: CountryBehavior {
+    private let readOnlyFieldIDs = ["first_name", "last_name", "birth_date"]
+    
+    // Provides API data loader
+    func prefilledDataLoader() -> PrefilledDataLoader? {
+        let url = URL(string: "https://some-api.com/api/nl-user-profile")!
+        let client = MockHTTPClient.makeSuccessNLProfileClient()
+        return RemotePrefilledDataLoader(url: url, client: client)
+    }
+    
+    // Transforms field definitions to mark specific fields as read-only
+    func apply(to definitions: [FieldDefinition], with prefilledData: [String: Any]?) -> [FieldDefinition] {
+        definitions.map { field in
+            var updatedField = field
+            if readOnlyFieldIDs.contains(field.id) {
+                updatedField.isReadOnly = true
+            }
+            return updatedField
+        }
+    }
+}
+```
+
+### 2. Remote Data Loading
+
+```swift
+public final class RemotePrefilledDataLoader: PrefilledDataLoader {
+    private let url: URL
+    private let client: HTTPClient
+    
+    public func load() async -> Result<[String: Any], Swift.Error> {
+        let result = await client.get(from: url)
+        
+        switch result {
+        case let .success((data, response)):
+            // Parse JSON response and map to form field format
+            let mappedData = try ProfileMapper.map(data, from: response)
+            return .success(mappedData)
+        case .failure:
+            return .failure(Error.connectivity)
+        }
+    }
+}
+```
+
+### 3. Integration Flow
+
+1. **Form Loading**: When user selects Netherlands, `FormViewModel` loads NL configuration
+2. **Behavior Resolution**: `CountryBehaviorRegistry` returns `NetherlandsBehavior`
+3. **Data Fetching**: Behavior's `prefilledDataLoader()` fetches user data from API
+4. **Field Transformation**: Behavior's `apply()` method marks specific fields as read-only
+5. **UI Rendering**: Read-only fields display pre-filled data but prevent editing
+
+### 4. Mock Implementation
+
+Since no real backend is available, the system uses `MockHTTPClient`:
+
+```swift
+public static func makeSuccessNLProfileClient() -> MockHTTPClient {
+    let json = Data("""
+    {
+        "firstName": "Jane",
+        "lastName": "Doe", 
+        "birthDate": "1992-05-23T10:00:00Z"
+    }
+    """.utf8)
+    
+    let response = HTTPURLResponse(url: apiURL, statusCode: 200, ...)
+    return MockHTTPClient(stub: .success((json, response)))
+}
+```
+
+This approach ensures:
+- **Separation of Concerns**: Netherlands logic is isolated
+- **Testability**: Easy to mock and test independently
+- **Extensibility**: Other countries can implement similar patterns
+- **Type Safety**: Compile-time checking for all operations
+
+## Working with External Configuration Files
+
+The package is designed to work with external YAML configuration files that are outside of developer control. The system adapts to whatever field definitions are provided:
+
+### Current Configuration Support
+
+The system handles these YAML structures:
 
 ```yaml
 country: NL
@@ -56,280 +314,40 @@ fields:
       - type: regex
         value: '^\d{9}$'
         message: 'BSN must be 9 digits'
-  - id: birth_date
-    label: Birth Date
-    type: date
-    required: true
 ```
 
-### ✅ Country-Specific Behaviors
-Netherlands automatically pre-fills data from API and marks fields read-only:
+### Resilient Design
+
+The architecture is built to be **configuration-agnostic**:
+
+- **Field IDs**: Works with any field identifiers defined in config
+- **Dynamic Validation**: Applies validation rules as specified
+- **Flexible Behaviors**: Country behaviors adapt to available fields
+- **Graceful Degradation**: Handles missing or unexpected fields
+
+### Netherlands Special Case
+
+For the Netherlands, the system looks for expected field patterns and applies read-only behavior when API data is available:
+- Fields with IDs `first_name`, `last_name`, `birth_date` → marked read-only if prefilled
+- System adapts if different field IDs are used in configuration
+- Gracefully handles missing or renamed fields
+
+This approach ensures the system works regardless of the exact field IDs used in external configuration files.
+
+## Quick Start
 
 ```swift
-// Automatically handles NL special case
-let (flow, formView) = FormComposer.makeKycFormView { formData in
-    // formData contains validated user input
-    submitToBackend(formData)
-}
-```
+import KYCForm
 
-### ✅ Comprehensive Validation Engine
-- **Required field validation** with localized messages
-- **Regex pattern matching** for format validation
-- **Length constraints** for text fields
-- **Date validation** (no future dates, age requirements)
-- **Value range validation** for numeric fields
-- **Composable validation rules** for complex requirements
-
-### ✅ Production-Ready Features
-- **Internationalization** support with `Localizable.xcstrings`
-- **Accessibility** compliance with VoiceOver support
-- **Thread-safe** date formatting with thread-local storage
-- **Error handling** with proper user feedback
-- **Loading states** for async operations
-
-## Usage Examples
-
-### Basic Implementation
-```swift
-struct BasicKYCView: View {
-    @State private var isCompleted = false
-    
+struct MyApp: View {
     var body: some View {
-        if isCompleted {
-            SuccessView()
-        } else {
-            let (_, formView) = FormComposer.makeKycFormView { formData in
-                handleKYCCompletion(formData)
-                isCompleted = true
-            }
-            formView
-        }
-    }
-}
-```
-
-### Navigation Integration
-```swift
-struct KYCFlowCoordinator: View {
-    @State private var path = NavigationPath()
-    
-    var body: some View {
-        NavigationStack(path: $path) {
-            StartView()
-                .navigationDestination(for: String.self) { route in
-                    if route == "kyc" {
-                        createKYCForm()
-                    }
-                }
-        }
-    }
-    
-    private func createKYCForm() -> some View {
         let (flow, formView) = FormComposer.makeKycFormView { formData in
-            Task {
-                await submitKYCData(formData)
-                path.removeLast()
-            }
+            print("KYC completed: \(formData)")
         }
         return formView
     }
 }
 ```
-
-### Advanced Flow Control
-```swift
-struct AdvancedKYCView: View {
-    @State private var submissionState: SubmissionState = .idle
-    
-    var body: some View {
-        let (flow, formView) = FormComposer.makeKycFormView { formData in
-            Task {
-                submissionState = .submitting
-                do {
-                    try await submitToBackend(formData)
-                    submissionState = .success
-                } catch {
-                    submissionState = .error(error)
-                }
-            }
-        }
-        
-        return formView
-            .onReceive(flow.formViewModel.$isLoading) { isLoading in
-                // React to loading state changes
-            }
-            .overlay(alignment: .center) {
-                if case .submitting = submissionState {
-                    ProgressView("Submitting...")
-                        .padding()
-                        .background(.regularMaterial)
-                        .cornerRadius(8)
-                }
-            }
-    }
-}
-```
-
-## Supported Countries
-
-| Country | Code | Special Behavior |
-|---------|------|------------------|
-| Netherlands | NL | API pre-fill + read-only fields |
-| Germany | DE | Standard validation |
-| United States | US | Standard validation |
-
-## Adding New Countries
-
-### 1. Create YAML Configuration
-```yaml
-# Sources/KYCFormInfrastructure/Resources/fr.yaml
-country: FR
-fields:
-  - id: first_name
-    label: Prénom
-    type: text
-    required: true
-  - id: nir
-    label: NIR (Social Security Number)
-    type: text
-    required: true
-    validation:
-      - type: regex
-        value: '^\d{15}$'
-        message: 'NIR must be 15 digits'
-```
-
-### 2. Add to CountryCode Enum
-```swift
-public enum CountryCode: String, CaseIterable {
-    case netherlands = "NL"
-    case germany = "DE"
-    case unitedStates = "US"
-    case france = "FR" // Add new country
-    
-    public var displayName: String {
-        switch self {
-        case .netherlands: return "Netherlands"
-        case .germany: return "Germany"
-        case .unitedStates: return "United States"
-        case .france: return "France" // Add display name
-        }
-    }
-    
-    public var flagEmoji: String {
-        switch self {
-        case .netherlands: return "🇳🇱"
-        case .germany: return "🇩🇪"
-        case .unitedStates: return "🇺🇸"
-        case .france: return "🇫🇷" // Add flag emoji
-        }
-    }
-}
-```
-
-### 3. Add Country-Specific Behavior (Optional)
-```swift
-struct FranceBehavior: CountryBehavior {
-    func prefilledDataLoader() -> PrefilledDataLoader? {
-        // Return nil for no pre-filling, or implement custom loader
-        return nil
-    }
-    
-    func apply(to definitions: [FieldDefinition], with prefilledData: [String: Any]?) -> [FieldDefinition] {
-        // Apply France-specific field modifications
-        return definitions
-    }
-}
-
-// Register in CountryBehaviorRegistry
-public convenience init() {
-    let specificBehaviors: [CountryCode: CountryBehavior] = [
-        .netherlands: NetherlandsBehavior(),
-        .france: FranceBehavior() // Add here
-    ]
-    // ...
-}
-```
-
-## Validation Rules
-
-The package provides a comprehensive validation system:
-
-```swift
-// Built-in validation rules
-RequiredValidationRule(message: "This field is required")
-RegexValidationRule(pattern: "^\\d{9}$", message: "Must be 9 digits")
-LengthValidationRule(min: 2, max: 50, message: "Must be 2-50 characters")
-ValueRangeValidationRule<Int>(min: 18, max: 99, message: "Age must be 18-99")
-MaximumDateValidationRule(date: Date(), message: "Cannot be future date")
-MinimumDateValidationRule(date: oldestDate, message: "Invalid birth date")
-```
-
-### Custom Validation Rules
-```swift
-struct EmailValidationRule: ValidationRule {
-    func validate(_ value: Any?) -> ValidationError? {
-        guard let email = value as? String else { return nil }
-        
-        let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-        let emailPredicate = NSPredicate(format: "SELF MATCHES %@", emailRegex)
-        
-        return emailPredicate.evaluate(with: email) ? nil :
-               ValidationError(message: "Invalid email format")
-    }
-}
-```
-
-## Testing
-
-Comprehensive test suite with high coverage:
-
-```bash
-swift test --enable-code-coverage
-```
-
-**Test Categories:**
-- ✅ Core domain logic and validation rules
-- ✅ YAML configuration parsing and error handling
-- ✅ Country-specific behaviors and data loading
-- ✅ Form submission and data transformation
-- ✅ UI component rendering and interaction
-- ✅ Thread safety and concurrency
-- ✅ Localization and accessibility
-
-## Performance Considerations
-
-### Thread-Safe Date Formatting
-Uses thread-local storage to prevent `DateFormatter` race conditions:
-
-```swift
-public static var displayDateFormatter: DateFormatter {
-    threadLocalFormatter(key: displayKey) {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .none
-        return formatter
-    }
-}
-```
-
-### Memory Management
-- **Immutable configurations** reduce memory overhead
-- **Lazy loading** of country configurations
-- **Automatic cleanup** of form state on completion
-
-### Async Operations
-- **Structured concurrency** with proper task management
-- **Cancellation support** for form loading operations
-- **Main actor isolation** for UI updates
-
-## Security Considerations
-
-- **Input validation** prevents injection attacks
-- **Type safety** eliminates many runtime vulnerabilities
-- **Immutable data structures** prevent accidental mutations
-- **Protocol boundaries** limit access to sensitive operations
 
 ## Requirements
 
@@ -340,30 +358,6 @@ public static var displayDateFormatter: DateFormatter {
 ## Dependencies
 
 - [Yams](https://github.com/jpsim/Yams) - YAML parsing and configuration loading
-
-## Migration Guide
-
-### From Legacy Form Systems
-1. **Extract field definitions** into YAML configuration files
-2. **Map validation logic** to `ValidationRule` implementations
-3. **Implement country behaviors** for special cases
-4. **Update UI bindings** to use `FieldViewModel` properties
-
-### Version Compatibility
-- **Backwards compatible** configuration format
-- **Incremental migration** support for existing forms
-- **Deprecation warnings** for legacy APIs
-
-## License
-
-MIT License - See LICENSE file for details.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Add comprehensive tests
-4. Submit a pull request
 
 ---
 
