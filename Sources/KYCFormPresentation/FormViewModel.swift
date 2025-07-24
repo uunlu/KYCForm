@@ -20,13 +20,13 @@ public final class FormViewModel: ObservableObject {
     @Published public private(set) var fieldViewModels: [FieldViewModel] = []
     @Published public private(set) var isLoading: Bool = false
     @Published public private(set) var submissionResult: FormData?
-    @Published public var selectedCountryCode: String = "NL" {
+    @Published public var selectedCountryCode: CountryCode = .netherlands {
         didSet {
             Task { await loadForm(for: selectedCountryCode) }
         }
     }
     
-    public let availableCountryCodes = ["NL", "DE", "US"]
+    public let availableCountryCodes = CountryCode.allCases
     
     // MARK: - Private Dependencies
     private let configurationLoader: ConfigurationLoader
@@ -50,18 +50,19 @@ public final class FormViewModel: ObservableObject {
     
     // MARK: - Public Methods
     
-    public func loadForm(for countryCode: String) async {
+    public func loadForm(for countryCode: CountryCode) async {
         isLoading = true
         defer { isLoading = false }
         
         let configResult = await configurationLoader.load(countryCode: countryCode)
+        let behavior = behaviorRegistry.behavior(for: countryCode)
+
         guard case .success(let config) = configResult else {
             print("Error loading configuration: \(configResult)")
             self.fieldViewModels = []
             return
         }
         
-        let behavior = behaviorRegistry.behavior(for: countryCode)
         var prefilledData: [String: Any]? = nil
         
         if let dataLoader = behavior.prefilledDataLoader() {
@@ -72,7 +73,7 @@ public final class FormViewModel: ObservableObject {
         }
         
         let finalFieldDefinitions = behavior.apply(to: config.fields, with: prefilledData)
-        print(finalFieldDefinitions)
+        
         self.fieldViewModels = finalFieldDefinitions.map { definition in
             FieldViewModel(
                 definition: definition,
@@ -89,7 +90,6 @@ public final class FormViewModel: ObservableObject {
             }
         }
         
-        // Manually send objectWillChange to ensure UI updates for validation errors.
         objectWillChange.send()
         
         guard allFieldsAreValid else {

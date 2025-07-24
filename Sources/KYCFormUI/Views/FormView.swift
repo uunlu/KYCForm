@@ -23,7 +23,10 @@ public struct FormView: View {
                 Section(header: Text("Select Country")) {
                     Picker("Country", selection: $viewModel.selectedCountryCode) {
                         ForEach(viewModel.availableCountryCodes, id: \.self) { code in
-                            Text(countryName(for: code)).tag(code)
+                            HStack {
+                                Text("\(code.flagEmoji) \(code.displayName)")
+                            }
+                            .tag(code)
                         }
                     }
                     .pickerStyle(.menu)

@@ -18,9 +18,12 @@ struct CodableCountryConfiguration: Codable {
     let country: String
     let fields: [CodableFieldDefinition]
     
-    func toDomain() -> CountryConfiguration {
-        CountryConfiguration(
-            countryCode: country,
+    func toDomain() -> CountryConfiguration? {
+        guard let code = CountryCode(rawValue: country) else {
+            return nil
+        }
+        return CountryConfiguration(
+            countryCode: code,
             fields: fields.map { $0.toDomain() }
         )
     }

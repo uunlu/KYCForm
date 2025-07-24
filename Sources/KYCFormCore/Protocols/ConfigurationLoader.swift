@@ -17,5 +17,5 @@ public protocol ConfigurationLoader {
     ///
     /// - Parameter countryCode: The two-letter ISO code for the country (e.g., "NL").
     /// - Returns: A `Result` containing the `CountryConfiguration` on success, or an `Error` on failure.
-    func load(countryCode: String) async -> Result<CountryConfiguration, Error>
+    func load(countryCode: CountryCode) async -> Result<CountryConfiguration, Error>
 }

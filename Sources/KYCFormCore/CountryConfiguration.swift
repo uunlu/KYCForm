@@ -13,13 +13,12 @@ import Foundation
 /// It holds the country's identifier and the complete list of `FieldDefinition`s required for its form.
 public struct CountryConfiguration: Equatable {
     
-    /// The two-letter ISO country code (e.g., "NL", "DE", "US").
-    public let countryCode: String
+    public let countryCode: CountryCode
     
     /// The ordered list of field definitions that make up the form for this country.
     public let fields: [FieldDefinition]
     
-    public init(countryCode: String, fields: [FieldDefinition]) {
+    public init(countryCode: CountryCode, fields: [FieldDefinition]) {
         self.countryCode = countryCode
         self.fields = fields
     }
