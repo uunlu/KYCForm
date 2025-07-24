@@ -1,0 +1,46 @@
+name: SwiftLint
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  swiftlint:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch full history for better diff support
+    
+    - name: Install SwiftLint
+      run: |
+        # Install SwiftLint via Homebrew
+        brew install swiftlint
+        
+        # Verify installation
+        swiftlint version
+    
+    - name: Run SwiftLint
+      run: |
+        # Run SwiftLint with strict mode
+        swiftlint lint --strict --reporter github-actions-logging
+      env:
+        # Set environment variables for better CI integration
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Run SwiftLint (Autocorrect) on PR
+      if: github.event_name == 'pull_request'
+      run: |
+        # Run autocorrect and check if any changes were made
+        swiftlint lint --fix --format
+        
+        # Check if autocorrect made any changes
+        if ! git diff --quiet; then
+          echo "SwiftLint autocorrect made changes. Please run 'swiftlint lint --fix' locally and commit the changes."
+          git diff --name-only
+          exit 1
+        fi
