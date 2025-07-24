@@ -16,12 +16,12 @@ import KYCFormCore
 public final class CountryBehaviorRegistry {
     private let behaviors: [CountryCode: CountryBehavior]
     private let defaultBehavior: CountryBehavior
-    
+
     public init(behaviors: [CountryCode: CountryBehavior], defaultBehavior: CountryBehavior) {
         self.behaviors = behaviors
         self.defaultBehavior = defaultBehavior
     }
-    
+
     /// A convenience initializer to set up the registry with our known behaviors.
     /// This is what we will use in our Composition Root.
     public convenience init() {
@@ -33,11 +33,11 @@ public final class CountryBehaviorRegistry {
             defaultBehavior: DefaultCountryBehavior()
         )
     }
-    
+
     /// Retrieves the behavior for a given country code.
     /// - Parameter countryCode: The two-letter ISO code for the country (e.g., "NL", "DE").
     /// - Returns: The specific `CountryBehavior` for that country, or the `defaultBehavior` if none is found.
     public func behavior(for countryCode: CountryCode) -> CountryBehavior {
-        return behaviors[countryCode] ?? defaultBehavior
+        behaviors[countryCode] ?? defaultBehavior
     }
 }

@@ -14,14 +14,14 @@ import KYCFormCore
 /// It's an example of the Null Object pattern, providing a non-nil, do-nothing object
 /// to simplify the logic in the calling code, avoiding the need for optionals.
 struct DefaultCountryBehavior: CountryBehavior {
-    
+
     /// This behavior does not require any pre-filled data.
     func prefilledDataLoader() -> PrefilledDataLoader? {
-        return nil
+        nil
     }
-    
+
     /// This behavior does not apply any transformations to the field definitions.
     func apply(to definitions: [FieldDefinition], with prefilledData: [String: Any]?) -> [FieldDefinition] {
-        return definitions
+        definitions
     }
 }

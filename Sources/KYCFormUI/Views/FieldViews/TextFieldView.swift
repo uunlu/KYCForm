@@ -10,16 +10,16 @@ import KYCFormCore
 import KYCFormPresentation
 
 struct TextFieldView: View {
-    
+
     @ObservedObject var viewModel: FieldViewModel
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             // Field Label
             Text(viewModel.label)
                 .font(.caption)
                 .foregroundColor(.secondary)
-            
+
             // The main input field
             if viewModel.isReadOnly {
                 // Read-only state: Display as simple text
@@ -32,7 +32,7 @@ struct TextFieldView: View {
             } else {
                 // Editable state: Display as a TextField
                 let textField = TextField(viewModel.placeholder, text: $viewModel.value)
-                
+
 #if os(iOS)
                 textField
                     .keyboardType(keyboardType(for: viewModel.type))
@@ -55,13 +55,13 @@ struct TextFieldView: View {
                     )
 #endif
             }
-            
+
             if !viewModel.helpText.isEmpty {
                 Text(viewModel.helpText)
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }
-            
+
             // Validation Error Message
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
@@ -72,6 +72,7 @@ struct TextFieldView: View {
         }
         .padding(.vertical, 6)
     }
+
 #if os(iOS)
     private func keyboardType(for fieldType: FieldType) -> UIKeyboardType {
         switch fieldType {
@@ -98,7 +99,7 @@ struct TextFieldView: View {
         helpText: "Enter your given name as it appears on your passport."
     )
     let editableViewModel = FieldViewModel(definition: editableDefinition)
-    
+
     // Create a sample FieldDefinition for a read-only field
     let readOnlyDefinition = FieldDefinition(
         id: "last_name",
@@ -107,7 +108,7 @@ struct TextFieldView: View {
         isReadOnly: true
     )
     let readOnlyViewModel = FieldViewModel(definition: readOnlyDefinition, prefilledValue: "Doe")
-    
+
     // Create a sample FieldDefinition for a field with an error
     let errorDefinition = FieldDefinition(
         id: "email",
@@ -115,18 +116,18 @@ struct TextFieldView: View {
         type: .email
     )
     let errorViewModel = FieldViewModel(definition: errorDefinition)
-    
+
     // Using a NavigationStack provides a more realistic preview environment
     return NavigationStack {
         Form {
             Section("Editable Field") {
                 TextFieldView(viewModel: editableViewModel)
             }
-            
+
             Section("Read-Only Field") {
                 TextFieldView(viewModel: readOnlyViewModel)
             }
-            
+
             Section("Error State") {
                 TextFieldView(viewModel: errorViewModel)
             }

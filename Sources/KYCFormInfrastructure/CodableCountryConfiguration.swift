@@ -17,7 +17,7 @@ import KYCFormCore
 struct CodableCountryConfiguration: Codable {
     let country: String
     let fields: [CodableFieldDefinition]
-    
+
     func toDomain() -> CountryConfiguration? {
         guard let code = CountryCode(rawValue: country) else {
             return nil
@@ -36,17 +36,17 @@ struct CodableFieldDefinition: Codable {
     let type: String
     let required: Bool?
     let validation: [CodableValidationRule]?
-    
+
     func toDomain() -> FieldDefinition {
         var rules: [any ValidationRule] = validation?.map { $0.toDomain() } ?? []
         if required == true {
             rules.insert(RequiredValidationRule(), at: 0)
         }
-        
+
         if type == "date" {
             addDefaultDateValidations(to: &rules)
         }
-        
+
         return FieldDefinition(
             id: id,
             label: label,
@@ -56,7 +56,7 @@ struct CodableFieldDefinition: Codable {
             validationRules: rules
         )
     }
-    
+
     private func mapFieldType(_ type: String) -> FieldType {
         switch type {
         case "text": return .text
@@ -65,24 +65,24 @@ struct CodableFieldDefinition: Codable {
         default: return .text // Fallback
         }
     }
-    
+
     private func addDefaultDateValidations(to rules: inout [any ValidationRule]) {
             // Check if NotNilDateValidator already exists
             let hasNotNilValidator = rules.contains { rule in
                 Swift.type(of: rule) == NotNilDateValidator.self
             }
-            
+
             // Check if NotFutureDateValidator already exists
             let hasNotFutureValidator = rules.contains { rule in
                 Swift.type(of: rule) == NotFutureDateValidator.self
             }
-            
+
             // Add NotNilDateValidator if not already present
             if !hasNotNilValidator {
             }
         rules.append(NotNilDateValidator())
         rules.append(NotFutureDateValidator())
-            
+
             // Add NotFutureDateValidator if not already present
             if !hasNotFutureValidator {
             }
@@ -96,7 +96,7 @@ struct CodableValidationRule: Codable {
     let message: String
     let min: Int? // For length/range
     let max: Int? // For length/range
-    
+
     func toDomain() -> any ValidationRule {
         switch type {
         case "regex":

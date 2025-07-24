@@ -13,8 +13,8 @@ final class DateValidationRuleTests: XCTestCase {
     // MARK: - Helpers
     private let calendar = Calendar.current
     private lazy var today: Date = { calendar.startOfDay(for: Date()) }()
-    private lazy var yesterday: Date = { calendar.date(byAdding: .day, value: -1, to: today)! }()
-    private lazy var tomorrow: Date = { calendar.date(byAdding: .day, value: 1, to: today)! }()
+    private lazy var yesterday: Date = { calendar.date(byAdding: .day, value: -1, to: today)! }() // swiftlint:disable:this force_unwrapping
+    private lazy var tomorrow: Date = { calendar.date(byAdding: .day, value: 1, to: today)! }() // swiftlint:disable:this force_unwrapping
 
     // MARK: - MaximumDateValidationRule Tests
 
@@ -27,7 +27,7 @@ final class DateValidationRuleTests: XCTestCase {
         let rule = MaximumDateValidationRule(date: today, message: "Error")
         XCTAssertNil(rule.validate(today))
     }
-    
+
     func test_maximumDateRule_returnsError_whenDateIsAfterMaximum() {
         let rule = MaximumDateValidationRule(date: today, message: "Date cannot be in the future")
         let error = rule.validate(tomorrow)
@@ -38,7 +38,7 @@ final class DateValidationRuleTests: XCTestCase {
         let rule = MaximumDateValidationRule(date: today, message: "Error")
         XCTAssertNil(rule.validate(nil))
     }
-    
+
     func test_maximumDateRule_returnsNoError_forNonDateInput() {
         let rule = MaximumDateValidationRule(date: today, message: "Error")
         XCTAssertNil(rule.validate("not a date"))
@@ -50,7 +50,7 @@ final class DateValidationRuleTests: XCTestCase {
         let rule = MinimumDateValidationRule(date: today, message: "Error")
         XCTAssertNil(rule.validate(tomorrow))
     }
-    
+
     func test_minimumDateRule_returnsNoError_whenDateIsSameAsMinimum() {
         let rule = MinimumDateValidationRule(date: today, message: "Error")
         XCTAssertNil(rule.validate(today))
@@ -61,7 +61,7 @@ final class DateValidationRuleTests: XCTestCase {
         let error = rule.validate(yesterday)
         XCTAssertEqual(error?.message, "Date is too early")
     }
-    
+
     func test_minimumDateRule_returnsNoError_forNilInput() {
         let rule = MinimumDateValidationRule(date: today, message: "Error")
         XCTAssertNil(rule.validate(nil))

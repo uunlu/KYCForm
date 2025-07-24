@@ -12,7 +12,7 @@ import Foundation
 /// This protocol is a key boundary in our architecture. It decouples the core domain logic
 /// from the specific implementation of how configurations are stored and parsed (e.g., YAML, JSON, from network, etc.).
 public protocol ConfigurationLoader {
-    
+
     /// Asynchronously loads the configuration for a specific country.
     ///
     /// - Parameter countryCode: The two-letter ISO code for the country (e.g., "NL").

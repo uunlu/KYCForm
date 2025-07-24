@@ -12,19 +12,18 @@ import KYCFormInfrastructure
 
 public struct FormView: View {
     @ObservedObject private var viewModel: FormViewModel
-    
+
     // MARK: Strings
     private let selectCountryText = L10n.string(for: "form.section.header.country_selector")
     private let pickerTitleText = L10n.string(for: "form.picker.label.country")
     private let submitText = L10n.string(for: "form.button.submit")
     private let navigationTitleText = L10n.string(for: "form.title")
     private let formSectionHeaderText = L10n.string(for: "form.section.header.user_information")
-    
-    
+
     public init(viewModel: FormViewModel) {
         self.viewModel = viewModel
     }
-    
+
     public var body: some View {
         NavigationStack {
             Form {
@@ -39,11 +38,11 @@ public struct FormView: View {
                     }
                     .pickerStyle(.menu)
                 }
-                
+
                 formContent
-                
+
                 Section {
-                    Button(action: { viewModel.submit() }) {
+                    Button(action: viewModel.submit) {
                         Text(submitText)
                             .frame(maxWidth: .infinity)
                     }
@@ -53,7 +52,7 @@ public struct FormView: View {
             .navigationTitle(navigationTitleText)
         }
     }
-    
+
     private var formContent: some View {
         Group {
             if viewModel.isLoading {
@@ -74,9 +73,9 @@ public struct FormView: View {
         }
         .id(viewModel.selectedCountryCode)
     }
-    
+
     // MARK: - Private Methods
-    
+
     private func loadForm() {
         Task {
             await viewModel.loadForm(for: viewModel.selectedCountryCode)
@@ -84,18 +83,17 @@ public struct FormView: View {
     }
 }
 
-
 // MARK: - Preview Provider
 
 #Preview {
     let loader = YAMLConfigurationLoader.makeForPackageResources()
     let registry = CountryBehaviorRegistry()
-    
+
     let viewModel = FormViewModel(
         configurationLoader: loader,
         behaviorRegistry: registry
     )
-    
+
     FormView(viewModel: viewModel)
 }
 
@@ -104,11 +102,11 @@ public struct FormView: View {
 #Preview {
     let loader = YAMLConfigurationLoader.makeForPackageResources()
     let registry = CountryBehaviorRegistry()
-    
+
     let viewModel = FormViewModel(
         configurationLoader: loader,
         behaviorRegistry: registry
     )
-    
+
     FormView(viewModel: viewModel)
 }

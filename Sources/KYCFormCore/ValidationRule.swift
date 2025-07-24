@@ -11,7 +11,7 @@ import Foundation
 /// It is `public` to be accessible by other modules and `Equatable` to be easily testable.
 public struct ValidationError: Error, Equatable {
     public let message: String
-    
+
     public init(message: String) {
         self.message = message
     }

@@ -17,7 +17,7 @@ public struct DateValidationError: Error {
 public struct MaximumDateValidationRule: ValidationRule {
     public let maximumDate: Date
     public let message: String
-    
+
     /// Initializes the rule with a maximum allowed date and an error message.
     /// - Parameters:
     ///   - date: The latest date that is considered valid.
@@ -33,12 +33,12 @@ public struct MaximumDateValidationRule: ValidationRule {
             // It relies on a `RequiredValidationRule` to handle nil.
             return nil
         }
-        
+
         // We compare only the date components, ignoring time.
         if Calendar.current.compare(dateValue, to: maximumDate, toGranularity: .day) == .orderedDescending {
             return ValidationError(message: self.message)
         }
-        
+
         return nil
     }
 }
@@ -63,11 +63,11 @@ public struct MinimumDateValidationRule: ValidationRule {
             // This rule does not validate non-date types or nil values.
             return nil
         }
-        
+
         if Calendar.current.compare(dateValue, to: minimumDate, toGranularity: .day) == .orderedAscending {
             return ValidationError(message: self.message)
         }
-        
+
         return nil
     }
 }

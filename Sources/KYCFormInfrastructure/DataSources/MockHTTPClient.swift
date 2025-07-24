@@ -25,21 +25,23 @@ public class MockHTTPClient: HTTPClient {
     /// A convenience factory that creates a client stubbed to successfully return
     /// the JSON for the `/api/nl-user-profile` endpoint.
     public static func makeSuccessNLProfileClient() -> MockHTTPClient {
-        let json = """
+        // swiftlint:disable force_unwrapping
+        let json = Data("""
         {
             "firstName": "Jane",
             "lastName": "Doe",
             "birthDate": "1992-05-23T10:00:00Z"
         }
-        """.data(using: .utf8)!
-        
+        """.utf8)
+
         let response = HTTPURLResponse(
             url: URL(string: "https://any-url.com/api/nl-user-profile")!,
             statusCode: 200,
             httpVersion: nil,
             headerFields: nil
         )!
-        
+        // swiftlint:enable force_unwrapping
+
         return MockHTTPClient(stub: .success((json, response)))
     }
 }

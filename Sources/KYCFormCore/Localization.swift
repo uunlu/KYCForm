@@ -10,7 +10,7 @@ import Foundation
 /// A helper struct that provides a centralized and simple way to access localized strings
 /// from within the package.
 public struct L10n {
-    
+
     /// Fetches a localized string from the package's `Localizable.xcstrings` catalog.
     ///
     /// - Parameter key: The key for the string, as defined in the string catalog.
@@ -19,6 +19,6 @@ public struct L10n {
         // .module is a synthesized static property that provides the bundle
         // for the current Swift package module. This correctly finds our
         // Localizable.xcstrings resource.
-        return NSLocalizedString(key, tableName: "Localizable", bundle: .module, comment: "")
+        NSLocalizedString(key, tableName: "Localizable", bundle: .module, comment: "")
     }
 }

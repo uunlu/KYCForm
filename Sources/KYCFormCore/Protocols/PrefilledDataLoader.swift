@@ -13,7 +13,7 @@ import Foundation
 /// user profile data for the Netherlands from an external source. The data returned
 /// is a simple dictionary, which can then be mapped to the form's fields.
 public protocol PrefilledDataLoader {
-    
+
     /// Asynchronously loads pre-filled data.
     ///
     /// - Returns: A `Result` containing a dictionary of data on success, or an `Error` on failure.

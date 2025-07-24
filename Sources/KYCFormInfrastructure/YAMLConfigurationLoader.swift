@@ -14,7 +14,7 @@ public final class YAMLConfigurationLoader: ConfigurationLoader {
         case fileNotFound(String)
         case decodingError(Error)
         case invalidCountryCodeInFile(String)
-        
+
         public var errorDescription: String? {
             switch self {
             case .fileNotFound(let fileName):
@@ -26,34 +26,34 @@ public final class YAMLConfigurationLoader: ConfigurationLoader {
             }
         }
     }
-    
+
     private let bundle: Bundle
-    
+
     public init(bundle: Bundle) {
         self.bundle = bundle
     }
-    
+
     public static func makeForPackageResources() -> YAMLConfigurationLoader {
-        return YAMLConfigurationLoader(bundle: .module)
+        YAMLConfigurationLoader(bundle: .module)
     }
-    
+
     public func load(countryCode: CountryCode) async -> Result<CountryConfiguration, Error> {
         let fileName = countryCode.rawValue.lowercased()
-        
+
         guard let fileURL = bundle.url(forResource: fileName, withExtension: "yaml") else {
             return .failure(LoaderError.fileNotFound("\(fileName).yaml"))
         }
-        
+
         do {
             let yamlString = try String(contentsOf: fileURL)
-            
+
             let decoder = YAMLDecoder()
             let codableConfig = try decoder.decode(CodableCountryConfiguration.self, from: yamlString)
-            
+
             guard let domainConfig = codableConfig.toDomain() else {
                 return .failure(LoaderError.invalidCountryCodeInFile(codableConfig.country))
             }
-            
+
             return .success(domainConfig)
         } catch {
             return .failure(LoaderError.decodingError(error))
