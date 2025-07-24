@@ -19,6 +19,7 @@ public final class FormViewModel: ObservableObject {
     // MARK: - Published Properties for UI
     @Published public private(set) var fieldViewModels: [FieldViewModel] = []
     @Published public private(set) var isLoading: Bool = false
+    @Published public private(set) var submissionResult: FormData?
     @Published public var selectedCountryCode: String = "NL" {
         didSet {
             Task { await loadForm(for: selectedCountryCode) }
@@ -80,28 +81,31 @@ public final class FormViewModel: ObservableObject {
         }
     }
     
-    public func submit() -> FormData? {
+    public func submit() {
         var allFieldsAreValid = true
         for vm in fieldViewModels {
             if !vm.validate() {
                 allFieldsAreValid = false
             }
         }
-
+        
+        // Manually send objectWillChange to ensure UI updates for validation errors.
+        objectWillChange.send()
+        
         guard allFieldsAreValid else {
-            #if canImport(UIKit)
-            UIAccessibility.post(notification: .announcement, argument: "Submission failed, please review errors.")
-            #endif
-            return nil
+            return // Exit if validation fails
         }
-
+        
         var formData = FormData()
         for vm in fieldViewModels {
             if !vm.isReadOnly {
+                // Use the correct typedValue() from the private extension
                 formData[vm.id] = vm.typedValue()
             }
         }
-        return formData
+        
+        // On success, set the published property.
+        self.submissionResult = formData
     }
 }
 
@@ -114,7 +118,7 @@ private extension FieldViewModel {
         case .number:
             return Double(value)
         case .date:
-            return value.isEmpty ? nil : value
+            return dateValue
         }
     }
 }

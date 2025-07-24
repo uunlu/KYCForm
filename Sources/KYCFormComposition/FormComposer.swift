@@ -18,38 +18,24 @@ import KYCFormUI
 /// connecting all the necessary components from the various modules to construct a fully
 /// functional KYC form view.
 public final class FormComposer {
-    
-    /// A private initializer to prevent anyone from creating an instance of this class.
-    /// Its methods should be accessed statically.
     private init() {}
     
-    /// Creates and returns a fully configured KYC form view.
+    /// Creates and returns a fully configured KYC form view managed by a flow coordinator.
     ///
-    /// This is the public API for the package. A host application will call this method
-    /// to get the SwiftUI view for the KYC flow.
+    /// This is the public API for SwiftUI applications. It sets up the entire flow
+    /// and returns both the coordinator (for programmatic control) and the view.
     ///
-    /// - Parameter onComplete: A closure that is called when the form is successfully
-    ///   submitted, providing the collected `FormData`.
-    /// - Returns: An opaque SwiftUI `View` that can be displayed by the host application.
+    /// - Parameter onComplete: A closure that is called when the form is successfully submitted.
+    /// - Returns: A tuple containing the `KYCFormFlow` coordinator and the SwiftUI `View`.
     @MainActor
-    public static func makeKycFormView(onComplete: @escaping (FormData) -> Void) -> some View {
+    public static func makeKycFormView(onComplete: @escaping (FormData) -> Void) -> (flow: KYCFormFlow, view: some View) {
         
-        // 1. Create the Infrastructure components
-        let configurationLoader = YAMLConfigurationLoader.makeForPackageResources()
-        let behaviorRegistry = CountryBehaviorRegistry()
+        // 1. Create the flow coordinator, passing in the completion handler.
+        let flow = KYCFormFlow(onComplete: onComplete)
         
-        // 2. Create the Presentation component (ViewModel)
-        let formViewModel = FormViewModel(
-            configurationLoader: configurationLoader,
-            behaviorRegistry: behaviorRegistry
-        )
+        // 2. Create the UI View, passing it the ViewModel from the flow.
+        let view = FormView(viewModel: flow.formViewModel)
         
-        // 3. Create the UI component (View)
-        let formView = FormView(
-            viewModel: formViewModel,
-            onComplete: onComplete
-        )
-        
-        return formView
+        return (flow, view)
     }
 }

@@ -11,16 +11,10 @@ import KYCFormPresentation
 import KYCFormInfrastructure
 
 public struct FormView: View {
-    @StateObject private var viewModel: FormViewModel
-    private let onComplete: (FormData) -> Void
+    @ObservedObject private var viewModel: FormViewModel
     
-    @State private var submissionResult: FormData?
-    @State private var showingSubmissionSummary = false
-    
-    // The init goes back to being simple. No Task here.
-    public init(viewModel: FormViewModel, onComplete: @escaping (FormData) -> Void) {
-        _viewModel = StateObject(wrappedValue: viewModel)
-        self.onComplete = onComplete
+    public init(viewModel: FormViewModel) {
+        self.viewModel = viewModel
     }
     
     public var body: some View {
@@ -39,7 +33,7 @@ public struct FormView: View {
                 formContent
                 
                 Section {
-                    Button(action: submitForm) {
+                    Button(action: { viewModel.submit() }) { // Simplified action
                         Text("Submit")
                             .frame(maxWidth: .infinity)
                     }
@@ -47,11 +41,6 @@ public struct FormView: View {
                 }
             }
             .navigationTitle("KYC Form")
-            .alert("Submission Successful", isPresented: $showingSubmissionSummary) {
-                Button("OK", role: .cancel) { }
-            } message: {
-                Text(submissionResult?.description ?? "No data.")
-            }
         }
     }
     
@@ -86,14 +75,6 @@ public struct FormView: View {
         }
     }
     
-    private func submitForm() {
-        if let formData = viewModel.submit() {
-            self.submissionResult = formData
-            self.showingSubmissionSummary = true
-            onComplete(formData)
-        }
-    }
-    
     private func countryName(for code: String) -> String {
         switch code {
         case "NL": return "Netherlands"
@@ -119,10 +100,7 @@ public struct FormView: View {
     )
     
     // 3. Return the FormView.
-    FormView(viewModel: viewModel) { formData in
-        // The onComplete closure for the preview can just print the data.
-        print("Preview form submitted with data: \(formData)")
-    }
+    FormView(viewModel: viewModel)
 }
 
 // MARK: - Preview Provider
@@ -139,8 +117,5 @@ public struct FormView: View {
     )
     
     // 3. Return the FormView.
-    return FormView(viewModel: viewModel) { formData in
-        // The onComplete closure for the preview can just print the data.
-        print("Preview form submitted with data: \(formData)")
-    }
+    FormView(viewModel: viewModel)
 }
