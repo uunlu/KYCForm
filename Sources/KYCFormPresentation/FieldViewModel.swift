@@ -18,7 +18,13 @@ import KYCFormCore
 public final class FieldViewModel: ObservableObject, Identifiable {
 
     // MARK: - Properties for UI Binding
-    @Published public var value: String = ""
+    @Published public var value: String = "" {
+        didSet {
+            if errorMessage != nil {
+                clearErrorIfValid()
+            }
+        }
+    }
     @Published public var dateValue: Date?
     @Published public private(set) var errorMessage: String?
 
@@ -70,6 +76,15 @@ public final class FieldViewModel: ObservableObject, Identifiable {
     }
 
     // MARK: - Private Helpers
+    
+    private func clearErrorIfValid() {
+        for rule in validationRules {
+            if rule.validate(typedValue()) != nil {
+                return // Still has validation errors, don't clear
+            }
+        }
+        errorMessage = nil
+    }
 
     /// Converts the string `value` back to its expected type for validation.
     private func typedValue() -> Any? {
