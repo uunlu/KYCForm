@@ -26,7 +26,10 @@ let package = Package(
         // MARK: - Core Layer (Domain)
         .target(
             name: "KYCFormCore",
-            dependencies: []
+            dependencies: [],
+            resources: [
+                .process("Resources")
+            ]
         ),
         .testTarget(
             name: "KYCFormCoreTests",

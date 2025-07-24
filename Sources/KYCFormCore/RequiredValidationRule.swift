@@ -15,7 +15,7 @@ public struct RequiredValidationRule: ValidationRule {
     
     private let message: String
     
-    public init(message: String = "This field is required.") {
+    public init(message: String = L10n.string(for: "validation.error.required")) {
         self.message = message
     }
     

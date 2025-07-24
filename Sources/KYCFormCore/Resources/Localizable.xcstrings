@@ -1,0 +1,157 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "form.button.submit" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Submit"
+          }
+        }
+      }
+    },
+    "form.picker.label.country" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Country"
+          }
+        }
+      }
+    },
+    "form.section.header.country_selector" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Country"
+          }
+        }
+      }
+    },
+    "form.section.header.user_information" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Information"
+          }
+        }
+      }
+    },
+    "form.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KYC Form"
+          }
+        }
+      }
+    },
+    "validation.error.age.maximum" : {
+      "comment" : "Sanity check error for being too old.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please enter a valid birth year."
+          }
+        }
+      }
+    },
+    "validation.error.age.minimum" : {
+      "comment" : "Error for not meeting the minimum age requirement.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You must be at least 18 years old."
+          }
+        }
+      }
+    },
+    "validation.error.bsn_format\t" : {
+      "comment" : "Specific error for the BSN regex.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BSN must be 9 digits"
+          }
+        }
+      }
+    },
+    "validation.error.date.in_future" : {
+      "comment" : "Error for a birth date set after today.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date cannot be in the future"
+          }
+        }
+      }
+    },
+    "validation.error.generic_length" : {
+      "comment" : "A generic message for the length rule.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The length is not valid."
+          }
+        }
+      }
+    },
+    "validation.error.invalid_number" : {
+      "comment" : "Error for ValueRangeValidationRule when input isn't a number.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Must be a valid number."
+          }
+        }
+      }
+    },
+    "validation.error.required" : {
+      "comment" : "Generic error for a missing required field.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This field is required.\t"
+          }
+        }
+      }
+    },
+    "validation.error.steuer_id_format\t" : {
+      "comment" : "Specific error for the German Tax ID regex.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Must have 11 digits\t"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

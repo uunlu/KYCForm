@@ -13,7 +13,6 @@ public final class YAMLConfigurationLoader: ConfigurationLoader {
     enum LoaderError: Error, LocalizedError {
         case fileNotFound(String)
         case decodingError(Error)
-        // Add a new error case for an invalid country code found inside the file
         case invalidCountryCodeInFile(String)
         
         public var errorDescription: String? {

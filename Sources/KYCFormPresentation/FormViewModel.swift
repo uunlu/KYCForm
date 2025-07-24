@@ -55,8 +55,9 @@ public final class FormViewModel: ObservableObject {
         
         let configResult = await configurationLoader.load(countryCode: countryCode)
         let behavior = behaviorRegistry.behavior(for: countryCode)
-
+        
         guard case .success(let config) = configResult else {
+            // TODO: replace with a logger
             print("Error loading configuration: \(configResult)")
             self.fieldViewModels = []
             return
@@ -102,7 +103,6 @@ public final class FormViewModel: ObservableObject {
             }
         }
         
-        // On success, set the published property.
         self.submissionResult = formData
     }
 }

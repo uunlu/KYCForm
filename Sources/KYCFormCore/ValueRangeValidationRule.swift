@@ -38,7 +38,7 @@ public struct ValueRangeValidationRule<T: Comparable & LosslessStringConvertible
         }
         
         guard let numericValue else {
-            return ValidationError(message: "Must be a valid number.")
+            return ValidationError(message: L10n.string(for: "validation.error.value.must_be_number"))
         }
         
         if let min, numericValue < min {

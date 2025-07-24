@@ -13,6 +13,14 @@ import KYCFormInfrastructure
 public struct FormView: View {
     @ObservedObject private var viewModel: FormViewModel
     
+    // MARK: Strings
+    private let selectCountryText = L10n.string(for: "form.section.header.country_selector")
+    private let pickerTitleText = L10n.string(for: "form.picker.label.country")
+    private let submitText = L10n.string(for: "form.button.submit")
+    private let navigationTitleText = L10n.string(for: "form.title")
+    private let formSectionHeaderText = L10n.string(for: "form.section.header.user_information")
+    
+    
     public init(viewModel: FormViewModel) {
         self.viewModel = viewModel
     }
@@ -20,8 +28,8 @@ public struct FormView: View {
     public var body: some View {
         NavigationStack {
             Form {
-                Section(header: Text("Select Country")) {
-                    Picker("Country", selection: $viewModel.selectedCountryCode) {
+                Section(header: Text(selectCountryText)) {
+                    Picker(pickerTitleText, selection: $viewModel.selectedCountryCode) {
                         ForEach(viewModel.availableCountryCodes, id: \.self) { code in
                             HStack {
                                 Text("\(code.flagEmoji) \(code.displayName)")
@@ -32,27 +40,24 @@ public struct FormView: View {
                     .pickerStyle(.menu)
                 }
                 
-                // This is where the main content lives.
                 formContent
                 
                 Section {
-                    Button(action: { viewModel.submit() }) { // Simplified action
-                        Text("Submit")
+                    Button(action: { viewModel.submit() }) {
+                        Text(submitText)
                             .frame(maxWidth: .infinity)
                     }
                     .disabled(viewModel.isLoading)
                 }
             }
-            .navigationTitle("KYC Form")
+            .navigationTitle(navigationTitleText)
         }
     }
     
-    // We extract the form content into a computed property.
     private var formContent: some View {
-        // We use a Group to apply modifiers to the content inside.
         Group {
             if viewModel.isLoading {
-                Section { // Wrap ProgressView in a Section for better layout
+                Section {
                     HStack {
                         Spacer()
                         ProgressView()
@@ -60,7 +65,7 @@ public struct FormView: View {
                     }
                 }
             } else {
-                Section(header: Text("Your Information")) {
+                Section(header: Text(formSectionHeaderText)) {
                     ForEach(viewModel.fieldViewModels) { fieldViewModel in
                         FieldViewFactory(viewModel: fieldViewModel)
                     }
@@ -77,48 +82,33 @@ public struct FormView: View {
             await viewModel.loadForm(for: viewModel.selectedCountryCode)
         }
     }
-    
-    private func countryName(for code: String) -> String {
-        switch code {
-        case "NL": return "Netherlands"
-        case "DE": return "Germany"
-        case "US": return "United States"
-        default: return code
-        }
-    }
 }
 
 
 // MARK: - Preview Provider
 
 #Preview {
-    // 1. Create the dependencies needed by the FormViewModel.
     let loader = YAMLConfigurationLoader.makeForPackageResources()
     let registry = CountryBehaviorRegistry()
     
-    // 2. Create the FormViewModel with the real dependencies.
     let viewModel = FormViewModel(
         configurationLoader: loader,
         behaviorRegistry: registry
     )
     
-    // 3. Return the FormView.
     FormView(viewModel: viewModel)
 }
 
 // MARK: - Preview Provider
 
 #Preview {
-    // 1. Create the dependencies needed by the FormViewModel.
     let loader = YAMLConfigurationLoader.makeForPackageResources()
     let registry = CountryBehaviorRegistry()
     
-    // 2. Create the FormViewModel with the real dependencies.
     let viewModel = FormViewModel(
         configurationLoader: loader,
         behaviorRegistry: registry
     )
     
-    // 3. Return the FormView.
     FormView(viewModel: viewModel)
 }
