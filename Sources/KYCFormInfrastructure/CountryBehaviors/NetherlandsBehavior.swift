@@ -17,7 +17,10 @@ struct NetherlandsBehavior: CountryBehavior {
     private let readOnlyFieldIDs = ["first_name", "last_name", "birth_date"]
     
     func prefilledDataLoader() -> PrefilledDataLoader? {
-        return MockPrefilledDataLoader()
+        // TODO: URL generating should go into a enum constant provider
+        let url = URL(string: "https://some-api.com/api/nl-user-profile")!
+        let client = MockHTTPClient.makeSuccessNLProfileClient()
+        return RemotePrefilledDataLoader(url: url, client: client)
     }
     
     /// After data is fetched, this method finds the relevant fields and marks them as read-only.
